@@ -4,19 +4,18 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.data.Main;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.EmptyBlockGetter;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class HitboxExtractor {
 
@@ -27,7 +26,7 @@ public class HitboxExtractor {
         }
 
         try {
-            Main.main(new String[]{ "--validate" });
+            Main.main(new String[] { "--validate" });
         } catch (Exception e) {
             System.out.println("Main call of the Minecraft client's init failed.");
             e.printStackTrace();
@@ -69,21 +68,12 @@ public class HitboxExtractor {
             for (Map.Entry<Property<?>, Comparable<?>> entry : state.getValues().entrySet())
                 properties.addProperty(entry.getKey().getName(), String.valueOf(entry.getValue()).toLowerCase());
 
-            JsonArray shape = new JsonArray();
-            for (AABB box : state.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).toAabbs()) {
-                JsonArray boxJsonArray = new JsonArray();
-                boxJsonArray.add(box.minX);
-                boxJsonArray.add(box.minY);
-                boxJsonArray.add(box.minZ);
-                boxJsonArray.add(box.maxX);
-                boxJsonArray.add(box.maxY);
-                boxJsonArray.add(box.maxZ);
-                shape.add(boxJsonArray);
-            }
+            Vec3 offset = state.getOffset(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).reverse();
+            VoxelShape shape = new VoxelShape(state.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).move(offset.x, offset.y, offset.z));
 
             JsonObject stateJson = new JsonObject();
             stateJson.add("properties", properties);
-            stateJson.add("shape", shape);
+            stateJson.add("shape", shape.optimize().toJson());
             states.add(stateJson);
         });
 
