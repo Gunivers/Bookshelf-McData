@@ -63,38 +63,40 @@ public class HitboxExtractor {
         JsonArray states = new JsonArray();
 
         block.getStateDefinition().getPossibleStates().forEach(state -> {
-
+            JsonObject stateJson = new JsonObject();
             JsonObject properties = new JsonObject();
+    
             for (Map.Entry<Property<?>, Comparable<?>> entry : state.getValues().entrySet())
                 properties.addProperty(entry.getKey().getName(), String.valueOf(entry.getValue()).toLowerCase());
-
-            Vec3 offset = null;
-            try {
-                Method method = getMethod(state.getClass(), "getOffset");
-                if (method != null) {
-                    Class<?>[] paramTypes = method.getParameterTypes();
-                    if (paramTypes.length == 2) {
-                        offset = (Vec3) method.invoke(state, EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
-                    } else if (paramTypes.length == 1) {
-                        offset = (Vec3) method.invoke(state, BlockPos.ZERO);
-                    }
-                } else {
-                    System.out.println("Method getOffset not found.");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            offset = offset.reverse();
-            VoxelShape shape = new VoxelShape(state
-                .getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO)
-                .move(offset.x, offset.y, offset.z)
-            );
-
-            JsonObject stateJson = new JsonObject();
-            stateJson.addProperty("has_offset", offset.x != 0.0);
             stateJson.add("properties", properties);
-            stateJson.add("shape", shape.optimize().toJson());
+
+            net.minecraft.world.phys.shapes.VoxelShape shape = state.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+
+            if (shape.toString().equals(state.getShape(EmptyBlockGetter.INSTANCE, new BlockPos(1, 0, 1)).toString())) {
+                stateJson.addProperty("has_offset", false);
+            } else {
+                Vec3 offset = null;
+                try {
+                    Method method = getMethod(state.getClass(), "getOffset");
+                    if (method != null) {
+                        Class<?>[] paramTypes = method.getParameterTypes();
+                        if (paramTypes.length == 2) {
+                            offset = (Vec3) method.invoke(state, EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+                        } else if (paramTypes.length == 1) {
+                            offset = (Vec3) method.invoke(state, BlockPos.ZERO);
+                        }
+                    } else {
+                        System.out.println("Method getOffset not found.");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                shape = shape.move(-offset.x, -offset.y, -offset.z);
+                stateJson.addProperty("has_offset", true);
+            }
+            
+            stateJson.add("shape", new VoxelShape(shape).optimize().toJson());
             states.add(stateJson);
         });
 
