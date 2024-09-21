@@ -92,6 +92,7 @@ public class HitboxExtractor {
             );
 
             JsonObject stateJson = new JsonObject();
+            stateJson.addProperty("has_offset", offset.x != 0.0);
             stateJson.add("properties", properties);
             stateJson.add("shape", shape.optimize().toJson());
             states.add(stateJson);
