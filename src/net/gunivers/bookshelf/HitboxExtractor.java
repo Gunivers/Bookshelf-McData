@@ -1,47 +1,31 @@
 package net.gunivers.bookshelf;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
-import net.minecraft.data.Main;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.phys.Vec3;
+import static net.gunivers.bookshelf.Extractor.writeJsonToFile;
 
 public class HitboxExtractor {
 
-    public static void main(String[] args) {
-        if (args.length < 1) {
-            System.err.println("Usage: java HitboxExtractor <minecraft_version>");
-            return;
-        }
-
-        try {
-            Main.main(new String[] { "--validate" });
-        } catch (Exception e) {
-            System.out.println("Main call of the Minecraft client's init failed.");
-            e.printStackTrace();
-            return;
-        }
-
+    public static void generateBlockShapes(String path, String fileName) {
         JsonObject blockShapes = extractBlockShapes();
-        writeJsonToFile("generated/" + args[0] + "/blocks/shapes.json", blockShapes, true);
-        writeJsonToFile("generated/" + args[0] + "/blocks/shapes.min.json", blockShapes, false);
+        writeJsonToFile(path + fileName + ".json", blockShapes, true);
+        writeJsonToFile(path + fileName + ".min.json", blockShapes, false);
     }
 
     /**
      * Extracts block shapes from the Minecraft Blocks registry.
      */
-    public static JsonObject extractBlockShapes() {
+    private static JsonObject extractBlockShapes() {
         JsonObject blocksJson = new JsonObject();
 
         for (Field blockField : Blocks.class.getFields()) {
@@ -101,19 +85,6 @@ public class HitboxExtractor {
         });
 
         return states;
-    }
-
-    /**
-     * Writes a JsonObject to a JSON file.
-     */
-    private static void writeJsonToFile(String fileName, JsonObject data, boolean prettyPrint) {
-        Gson gson = prettyPrint ? new GsonBuilder().setPrettyPrinting().create() : new Gson();
-
-        try (FileWriter writer = new FileWriter(fileName)) {
-            gson.toJson(data, writer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
