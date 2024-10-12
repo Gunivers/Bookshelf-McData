@@ -4,13 +4,19 @@ import static net.gunivers.bookshelf.Extractor.writeJsonToFile;
 import com.google.gson.JsonObject;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+
+import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import net.minecraft.world.level.block.SoundType;
 
 public class SoundExtractor {
 
-    public static void generateBlockSounds(String path, String fileName) {
+    public static void generateBlockSounds(String path, String fileName) throws IOException {
+        System.out.println("Generating block sounds...");
+        Files.createDirectories(Path.of(path));
         JsonObject blockSounds = extractBlocksSounds();
         writeJsonToFile(path + fileName + ".json", blockSounds, true);
         writeJsonToFile(path + fileName + ".min.json", blockSounds, false);
@@ -33,11 +39,11 @@ public class SoundExtractor {
     private static JsonObject extractBlockSounds(Block block) {
         JsonObject blockJson = new JsonObject();
         SoundType sound = block.defaultBlockState().getSoundType();
-        blockJson.addProperty("break", sound.getBreakSound().getLocation().toString());
-        blockJson.addProperty("hit", sound.getHitSound().getLocation().toString());
-        blockJson.addProperty("fall", sound.getFallSound().getLocation().toString());
-        blockJson.addProperty("place", sound.getPlaceSound().getLocation().toString());
-        blockJson.addProperty("step", sound.getStepSound().getLocation().toString());
+        blockJson.addProperty("break", sound.getBreakSound().location().toString());
+        blockJson.addProperty("hit", sound.getHitSound().location().toString());
+        blockJson.addProperty("fall", sound.getFallSound().location().toString());
+        blockJson.addProperty("place", sound.getPlaceSound().location().toString());
+        blockJson.addProperty("step", sound.getStepSound().location().toString());
         return blockJson;
     }
 

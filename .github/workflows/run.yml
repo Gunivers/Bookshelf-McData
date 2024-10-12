@@ -22,11 +22,13 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
       - run: |
-          bash extract.sh ${{ inputs.version }}
+          chmod +x ./gradlew
+          ./gradlew build -Pversion=${{ inputs.version }}
+          ./gradlew run -Pversion=${{ inputs.version }}
           git checkout --orphan temp
           cp -r "generated/${{ inputs.version }}/"* .
           git clean -fdX
-          rm -r .github/ src/ extract.sh .gitignore
+          rm -r .github/ src/ gradle/ .gitignore .gitattributes build.gradle gradle.properties gradlew gradlew.bat settings.gradle .run
           git add .
           git commit -m "🚀 Update generated contents for ${{ inputs.version }}"
           git tag -f "${{ inputs.version }}"

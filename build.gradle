@@ -1,0 +1,37 @@
+plugins {
+	id 'fabric-loom' version '1.8-SNAPSHOT'
+	id 'maven-publish'
+	id "application"
+}
+
+apply plugin : "java"
+
+project.logger.lifecycle("Using Minecraft version: ${version}")
+
+ext {
+	javaMainClass = "net.gunivers.bookshelf.Extractor"
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${version}"
+	mappings loom.officialMojangMappings()
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 21
+}
+
+java {
+	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+application {
+	mainClassName = javaMainClass
+}
+
+tasks.withType(JavaExec.class).configureEach {
+	args = [version]
+}

@@ -32,12 +32,15 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
+      - uses: gradle/gradle-build-action@v2
       - run: |
-          bash extract.sh ${{ needs.check.outputs.id }}
+          chmod +x ./gradlew
+          ./gradlew build -Pversion=${{ needs.check.outputs.id }}
+          ./gradlew run -Pversion=${{ needs.check.outputs.id }}
           git checkout --orphan temp
           cp -r "generated/${{ needs.check.outputs.id }}/"* .
           git clean -fdX
-          rm -r .github/ src/ extract.sh .gitignore
+          rm -r .github/ src/ gradle/ .gitignore .gitattributes build.gradle gradle.properties gradlew gradlew.bat settings.gradle .run
           git add .
           git commit -m "🚀 Update generated contents for ${{ needs.check.outputs.id }}"
           git tag -f "${{ needs.check.outputs.id }}"
