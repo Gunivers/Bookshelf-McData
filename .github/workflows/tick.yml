@@ -34,6 +34,7 @@ jobs:
           java-version: '21'
       - uses: gradle/gradle-build-action@v2
       - run: |
+          chmod +x ./gradlew
           ./gradlew build -Pversion1.21.2-pre3
           ./gradlew run -Pversion1.21.2-pre3
           git checkout --orphan temp
