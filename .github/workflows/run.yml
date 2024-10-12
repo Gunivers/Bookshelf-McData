@@ -23,13 +23,13 @@ jobs:
           java-version: '21'
       - run: |
           chmod +x ./gradlew
-          ./gradlew build -Pversion=${{ needs.check.outputs.id }}
-          ./gradlew run -Pversion=${{ needs.check.outputs.id }}
+          ./gradlew build -Pversion=${{ inputs.version }}
+          ./gradlew run -Pversion=${{ inputs.version }}
           git checkout --orphan temp
-          cp -r "generated/${{ needs.check.outputs.id }}/"* .
+          cp -r "generated/${{ inputs.version }}/"* .
           git clean -fdX
           rm -r .github/ src/ .gitignore .gitattributes build.gradle gradle.properties gradlew gradlew.bat settings.gradle .run
           git add .
-          git commit -m "🚀 Update generated contents for ${{ needs.check.outputs.id }}"
-          git tag -f "${{ needs.check.outputs.id }}"
-          git push origin "${{ needs.check.outputs.id }}" --force
+          git commit -m "🚀 Update generated contents for ${{ inputs.version }}"
+          git tag -f "${{ inputs.version }}"
+          git push origin "${{ inputs.version }}" --force
