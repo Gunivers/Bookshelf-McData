@@ -3,8 +3,12 @@ package net.gunivers.bookshelf;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
@@ -16,7 +20,9 @@ import static net.gunivers.bookshelf.Extractor.writeJsonToFile;
 
 public class HitboxExtractor {
 
-    public static void generateBlockShapes(String path, String fileName) {
+    public static void generateBlockShapes(String path, String fileName) throws IOException {
+        System.out.println("Generating block shapes...");
+        Files.createDirectories(Path.of(path));
         JsonObject blockShapes = extractBlockShapes();
         writeJsonToFile(path + fileName + ".json", blockShapes, true);
         writeJsonToFile(path + fileName + ".min.json", blockShapes, false);

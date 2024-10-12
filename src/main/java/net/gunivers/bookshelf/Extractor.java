@@ -11,9 +11,9 @@ import static net.gunivers.bookshelf.SoundExtractor.generateBlockSounds;
 
 public class Extractor {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if (args.length < 1) {
-            System.err.println("Usage: java HitboxExtractor <minecraft_version>");
+            System.err.println("Usage: java Extractor <minecraft_version>");
             return;
         }
 
