@@ -40,7 +40,7 @@ jobs:
           git checkout --orphan temp
           cp -r "generated/${{ needs.check.outputs.id }}/"* .
           git clean -fdX
-          rm -r .github/ src/ .gitignore .gitattributes build.gradle gradle.properties gradlew gradlew.bat settings.gradle .run
+          rm -r .github/ src/ gradle/ .gitignore .gitattributes build.gradle gradle.properties gradlew gradlew.bat settings.gradle .run
           git add .
           git commit -m "🚀 Update generated contents for ${{ needs.check.outputs.id }}"
           git tag -f "${{ needs.check.outputs.id }}"
